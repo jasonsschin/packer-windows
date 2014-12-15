@@ -1,0 +1,67 @@
+{
+  "variables": {
+    "version": "0.0.1",
+    "memory": "4096",
+    "cpus": "2",
+    "iso_url": "iso/en_windows_8.1_professional_vl_with_update_x64_dvd_4065194.iso",
+    "iso_checksum": "eb75a3d3c0f621f175b75dc65db036d0e00eac43"
+  },
+  "builders": [
+    {
+      "type": "parallels-iso",
+      "guest_os_type": "win-8.1",
+      "iso_url": "{{ user `iso_url` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_checksum_type": "none",
+      "parallels_tools_flavor": "win",
+      "parallels_tools_mode": "upload",
+      "parallels_tools_guest_path": "c:/windows/temp/parallels.iso",
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_wait_timeout": "30s",
+      "boot_wait": "30s",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_wait_timeout": "2h",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "disk_size": 61440,
+      "output_directory": "output",
+      "floppy_files": [
+        "./answer_files/81/autounattend.xml",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/win-updates.ps1",
+        "./scripts/openssh.ps1",
+        "./scripts/vm-guest-tools.bat"
+      ],
+      "prlctl": [
+        ["set", "{{.Name}}", "--cpus", "{{ user `cpus` }}"],
+        ["set", "{{.Name}}", "--memsize", "{{ user `memory` }}"]
+      ]
+    }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "remote_path": "/tmp/script.bat",
+        "execute_command": "{{.Vars}} cmd /c C:/Windows/Temp/script.bat",
+        "pause_before": "300s",
+        "scripts": [
+          "./scripts/vm-guest-tools.bat",
+          "./scripts/compact.bat"
+        ]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "rm -rf /tmp/*"
+        ]
+      }
+    ],
+    "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "box/windows_81_{{.Provider}}.box"
+    }
+    ]
+}

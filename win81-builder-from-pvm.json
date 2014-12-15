@@ -1,0 +1,30 @@
+{
+  "variables": {
+    "version": "0.0.1",
+    "memory": "4096",
+    "cpus": "2",
+    "iso_url": "iso/en_windows_8.1_professional_vl_with_update_x64_dvd_4065194.iso",
+    "iso_checksum": "eb75a3d3c0f621f175b75dc65db036d0e00eac43"
+  },
+  "builders": [
+    {
+      "type": "parallels-pvm",
+      "parallels_tools_flavor": "win",
+      "source_path": "packer-parallels-iso.pvm",
+      "parallels_tools_flavor": "win",
+      "parallels_tools_mode": "attach",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_wait_timeout": "30s",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "output_directory": "output"
+    }
+    ],
+    "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "box/windows_81_{{.Provider}}.box"
+    }
+    ]
+}
