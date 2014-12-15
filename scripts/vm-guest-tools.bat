@@ -5,6 +5,7 @@ msiexec /qb /i C:\Windows\Temp\7z920-x64.msi
 
 if "%PACKER_BUILDER_TYPE%" equ "vmware-iso" goto :vmware
 if "%PACKER_BUILDER_TYPE%" equ "virtualbox-iso" goto :virtualbox
+if "%PACKER_BUILDER_TYPE%" equ "parallels-iso" goto :parallels
 goto :done
 
 :vmware
@@ -36,6 +37,20 @@ cmd /c certutil -addstore -f "TrustedPublisher" A:\oracle-cert.cer
 move /Y C:\Users\vagrant\VBoxGuestAdditions.iso C:\Windows\Temp
 cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"
 cmd /c C:\Windows\Temp\virtualbox\VBoxWindowsAdditions.exe /S
+goto :done
+
+:parallels
+
+if exist "C:\Windows\Temp\parallels.iso" (
+    echo "Installing Parallels windows tools..."
+    cmd /c ""C:\Program Files\7-Zip\7z.exe" x "C:\Windows\Temp\parallels.iso" -oC:\Windows\Temp\Parallels"
+    cmd /c "C:\Windows\Temp\Parallels\PTAgent.exe /install_silent"
+)
+
+if not exist "C:\Windows\Temp\parallels.iso" (
+    echo "Parallels windows tools are unavailable"
+)
+
 goto :done
 
 :done
